@@ -58,33 +58,141 @@ body {
 <body>
     <h1>女優名鑑サイトへようこそ！</h1>
     <p>このサイトは、APIを利用した女優検索機能の学習用サイトです。</p>
+    
     <div class="search-area">
-    <h2>女優検索フォーム</h2>
-    <div class="input-group">
-        <label for="height">身長 (cm):</label>
-        <input type="number" id="height_min" placeholder="最低身長">
-        <span>〜</span>
-        <input type="number" id="height_max" placeholder="最高身長">
+        <h2>女優検索フォーム</h2>
+        <div class="input-group">
+            <label for="height">身長 (cm):</label>
+            <input type="number" id="height_min" placeholder="最低身長" min="100" max="200" style="width: 80px;">
+            <span>〜</span>
+            <input type="number" id="height_max" placeholder="最高身長" min="100" max="200" style="width: 80px;">
+        </div>
+
+        <div class="input-group">
+            <label for="cup">カップ数:</label>
+            <select id="cup">
+                <option value="">すべて</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+                <option value="H">H</option>
+                <option value="I">I</option>
+                <option value="J">J</option>
+                <option value="K">K</option>
+                <option value="L">L</option>
+                <option value="L以上">L以上</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label for="age">年齢:</label>
+            <input type="number" id="age_min" placeholder="最低年齢" min="18" style="width: 80px;">
+            <span>〜</span>
+            <input type="number" id="age_max" placeholder="最高年齢" min="18" style="width: 80px;">
+        </div>
+        
+        <button id="search-button" onclick="fetchActressData()">検索する</button>
     </div>
 
-    <div class="input-group">
-        <label for="cup">カップ数:</label>
-        <select id="cup">
-            <option value="">すべて</option>
-            <option value="A">Aカップ</option>
-            <option value="F">Fカップ以上</option>
-            <option option="J">Jカップ以上</option>
-        </select>
+    <hr>
+
+    <div class="actress-list">
+        <h2>検索結果</h2>
+        <p id="loading-message">ここに女優さんのデータが表示される予定です。FANZAの承認を待っています...</p>
     </div>
+    
+    <script>
+    // -----------------------------------------------------------
+    // 独自の検索タグ用データ (要望③, ④)
+    // 承認後、APIデータと照合するために使います。
+    // -----------------------------------------------------------
+    // ★注: これは、あなたのスプレッドシートの情報を元にした仮のデータです。★
+    const localActressData = [
+        { name: "石川 澪", bodyType: "スレンダー", genre: ["可愛い系", "清楚系"] },
+        { name: "河北 彩伽（河北 彩花）", bodyType: "スレンダー", genre: ["美人系", "清楚系"] },
+        { name: "瀬戸 環奈", bodyType: "グラマー", genre: ["清楚系", "可愛い系"] },
+    ];
 
-    <button id="search-button">検索する</button>
-</div>
+    // -----------------------------------------------------------
+    // 検索ボタンが押されたときに実行される関数
+    // -----------------------------------------------------------
+    function fetchActressData() {
+        // 🚨 承認後、ここをあなたのキーに置き換えます 🚨
+        const CLIENT_ID = "[あなたのClient ID]"; 
+        const AFFILIATE_ID = "[あなたのAffiliate ID]";
+        
+        // 検索条件の取得
+        const heightMin = document.getElementById('height_min').value;
+        const heightMax = document.getElementById('height_max').value;
+        let cup = document.getElementById('cup').value;
+        const ageMin = document.getElementById('age_min').value;
+        const ageMax = document.getElementById('age_max').value;
 
-<hr>
+        // FANZA APIの基本設定
+        const API_ENDPOINT = "https://api.dmm.com/affiliate/v3/ItemList";
+        const keyParams = `api_id=${CLIENT_ID}&affiliate_id=${AFFILIATE_ID}`;
+        
+        // 検索条件を組み立てる
+        let searchParams = 'site=DMM.R18&service=digital&hits=50&sort=rank&keyword=女優';
+        
+        // 1. カップ数の条件を追加 (要望①)
+        if (cup) {
+            if (cup === "L以上") {
+                searchParams += `&bust=L`;
+            } else {
+                searchParams += `&bust=${cup}`; 
+            }
+        }
+        
+        // 3. 身長の条件を追加
+        if (heightMin) {
+            searchParams += `&min_height=${heightMin}`;
+        }
+        if (heightMax) {
+            searchParams += `&max_height=${heightMax}`;
+        }
+        
+        // 最終的なリクエストURL
+        const requestUrl = `${API_ENDPOINT}?${keyParams}&${searchParams}`;
 
-<div class="actress-list">
-    <h2>検索結果</h2>
-    <p id="loading-message">ここに女優さんのデータが表示される予定です。FANZAの承認を待っています...</p>
-</div>
-    </body>
+        // 検索結果エリアの表示を更新
+        const resultDiv = document.querySelector('.actress-list');
+        resultDiv.innerHTML = '<h2>検索結果</h2><p>データを取得中です...</p>';
+
+        // サーバーにリクエストを送信！
+        fetch(requestUrl)
+          .then(response => response.json())
+          .then(data => {
+            // コンソールにデータを表示 (F12キーで確認)
+            console.log("APIから取得したデータ:", data); 
+
+            let filteredItems = data.result.items || [];
+            
+            // データをサイトに表示する処理
+            resultDiv.innerHTML = `<h2>検索結果 (${filteredItems.length}件表示 - 承認待ち)</h2>`;
+            
+            if (filteredItems.length > 0) {
+                 filteredItems.forEach(item => {
+                     // 仮でタイトルと、APIが持っているカップ数を表示
+                     const bustSize = item.sizes ? ` (B: ${item.sizes.bust})` : '';
+                     resultDiv.innerHTML += `<div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 5px;">
+                                                <p><strong>${item.title}</strong>${bustSize}</p>
+                                                <p>API承認後、ここに詳細情報が表示されます。</p>
+                                             </div>`;
+                 });
+            } else {
+                resultDiv.innerHTML += `<p>該当する女優が見つかりませんでした。</p>`;
+            }
+          })
+          .catch(error => {
+            console.error('データの取得に失敗しました:', error);
+            resultDiv.innerHTML = '<h2>エラー</h2><p>APIキーの認証に失敗しているか、FANZAの承認待ちです。</p>';
+          });
+    }
+    </script>
+</body>
 </html>
