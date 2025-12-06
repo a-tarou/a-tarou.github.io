@@ -4,10 +4,87 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>女優名鑑（学習サイト）</title>
+
+<style>
+/* CSSのコードはここから */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+.search-area {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input-group input[type="number"], .input-group select {
+    padding: 8px;
+    margin-right: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#search-button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#search-button:hover {
+    background-color: #0056b3;
+}
+</style>
+
 </head>
 <body>
     <h1>女優名鑑サイトへようこそ！</h1>
     <p>このサイトは、APIを利用した女優検索機能の学習用サイトです。</p>
-    
+    <div class="search-area">
+    <h2>女優検索フォーム</h2>
+    <div class="input-group">
+        <label for="height">身長 (cm):</label>
+        <input type="number" id="height_min" placeholder="最低身長">
+        <span>〜</span>
+        <input type="number" id="height_max" placeholder="最高身長">
+    </div>
+
+    <div class="input-group">
+        <label for="cup">カップ数:</label>
+        <select id="cup">
+            <option value="">すべて</option>
+            <option value="A">Aカップ</option>
+            <option value="F">Fカップ以上</option>
+            <option option="J">Jカップ以上</option>
+        </select>
+    </div>
+
+    <button id="search-button">検索する</button>
+</div>
+
+<hr>
+
+<div class="actress-list">
+    <h2>検索結果</h2>
+    <p id="loading-message">ここに女優さんのデータが表示される予定です。FANZAの承認を待っています...</p>
+</div>
     </body>
 </html>
