@@ -24,6 +24,8 @@ body {
 
 .input-group {
     margin-bottom: 15px;
+    /* チェックボックスを見やすくするためにフレックスコンテナとして設定 */
+    display: block; 
 }
 
 .input-group label {
@@ -37,6 +39,13 @@ body {
     margin-right: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+/* チェックボックスとラベルの配置を調整 */
+#cup-checkboxes input[type="checkbox"], 
+#cup-checkboxes label {
+    margin-right: 15px; /* チェックボックス間のスペース */
+    display: inline-block;
 }
 
 #search-button {
@@ -61,38 +70,52 @@ body {
     
     <div class="search-area">
         <h2>女優検索フォーム</h2>
-        <div class="input-group">
-            <label for="height">身長 (cm):</label>
-            <input type="number" id="height_min" placeholder="最低身長" min="100" max="200" style="width: 80px;">
-            <span>〜</span>
-            <input type="number" id="height_max" placeholder="最高身長" min="100" max="200" style="width: 80px;">
-        </div>
-
-        <div class="input-group">
-            <label for="cup">カップ数:</label>
-            <select id="cup">
-                <option value="">すべて</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="G">G</option>
-                <option value="H">H</option>
-                <option value="I">I</option>
-                <option value="J">J</option>
-                <option value="K">K</option>
-                <option value="L">L</option>
-                <option value="L以上">L以上</option>
-            </select>
-        </div>
         
         <div class="input-group">
             <label for="age">年齢:</label>
             <input type="number" id="age_min" placeholder="最低年齢" min="18" style="width: 80px;">
             <span>〜</span>
             <input type="number" id="age_max" placeholder="最高年齢" min="18" style="width: 80px;">
+        </div>
+
+        <div class="input-group">
+            <label for="height">身長 (cm):</label>
+            <input type="number" id="height_min" placeholder="最低身長" min="100" max="200" style="width: 80px;">
+            <span>〜</span>
+            <input type="number" id="height_max" placeholder="最高身長" min="100" max="200" style="width: 80px;">
+        </div>
+        
+        <div class="input-group">
+            <label>カップ数 (複数選択可):</label>
+            <div id="cup-checkboxes" style="display: flex; flex-wrap: wrap;">
+                <input type="checkbox" id="cup_A" name="cup" value="A"><label for="cup_A">A</label>
+                <input type="checkbox" id="cup_B" name="cup" value="B"><label for="cup_B">B</label>
+                <input type="checkbox" id="cup_C" name="cup" value="C"><label for="cup_C">C</label>
+                <input type="checkbox" id="cup_D" name="cup" value="D"><label for="cup_D">D</label>
+                <input type="checkbox" id="cup_E" name="cup" value="E"><label for="cup_E">E</label>
+                <input type="checkbox" id="cup_F" name="cup" value="F"><label for="cup_F">F</label>
+                <input type="checkbox" id="cup_G" name="cup" value="G"><label for="cup_G">G</label>
+                <input type="checkbox" id="cup_H" name="cup" value="H"><label for="cup_H">H</label>
+                <input type="checkbox" id="cup_I" name="cup" value="I"><label for="cup_I">I</label>
+                <input type="checkbox" id="cup_J" name="cup" value="J"><label for="cup_J">J</label>
+                <input type="checkbox" id="cup_K" name="cup" value="K"><label for="cup_K">K</label>
+                <input type="checkbox" id="cup_L" name="cup" value="L"><label for="cup_L">L</label>
+                <input type="checkbox" id="cup_L_over" name="cup" value="L以上"><label for="cup_L_over">L以上</label>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label>体型 (独自タグ):</label>
+            <div id="bodytype-checkboxes" style="display: flex; flex-wrap: wrap;">
+                <p style="font-size: 0.9em; color: #666;">※ここに体型のチェックボックスが表示されます（承認後に実装）</p>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>系統 (独自タグ):</label>
+            <div id="genre-checkboxes" style="display: flex; flex-wrap: wrap;">
+                <p style="font-size: 0.9em; color: #666;">※ここに系統のチェックボックスが表示されます（承認後に実装）</p>
+            </div>
         </div>
         
         <button id="search-button" onclick="fetchActressData()">検索する</button>
@@ -108,9 +131,7 @@ body {
     <script>
     // -----------------------------------------------------------
     // 独自の検索タグ用データ (要望③, ④)
-    // 承認後、APIデータと照合するために使います。
     // -----------------------------------------------------------
-    // ★注: これは、あなたのスプレッドシートの情報を元にした仮のデータです。★
     const localActressData = [
         { name: "石川 澪", bodyType: "スレンダー", genre: ["可愛い系", "清楚系"] },
         { name: "河北 彩伽（河北 彩花）", bodyType: "スレンダー", genre: ["美人系", "清楚系"] },
@@ -128,9 +149,12 @@ body {
         // 検索条件の取得
         const heightMin = document.getElementById('height_min').value;
         const heightMax = document.getElementById('height_max').value;
-        let cup = document.getElementById('cup').value;
         const ageMin = document.getElementById('age_min').value;
         const ageMax = document.getElementById('age_max').value;
+        
+        // 複数選択されたカップ数を取得する処理 (新しいロジック)
+        const checkedCups = Array.from(document.querySelectorAll('input[name="cup"]:checked'))
+                                 .map(checkbox => checkbox.value);
 
         // FANZA APIの基本設定
         const API_ENDPOINT = "https://api.dmm.com/affiliate/v3/ItemList";
@@ -139,12 +163,21 @@ body {
         // 検索条件を組み立てる
         let searchParams = 'site=DMM.R18&service=digital&hits=50&sort=rank&keyword=女優';
         
-        // 1. カップ数の条件を追加 (要望①)
-        if (cup) {
-            if (cup === "L以上") {
-                searchParams += `&bust=L`;
-            } else {
-                searchParams += `&bust=${cup}`; 
+        // 1. カップ数の条件を追加 (要望① - 複数選択対応)
+        if (checkedCups.length > 0) {
+            // Lカップ以上 ("L以上") のチェックボックスが選択されているか確認
+            const includesLOver = checkedCups.includes("L以上");
+            
+            // 選択された中で最も小さなカップ数（例: B, C, Dが選択されたら B）をAPIに送ります
+            const sortedCups = checkedCups
+                                .filter(c => c.length === 1) // L以上の文字列を除外
+                                .sort(); 
+
+            let minCupForAPI = sortedCups.length > 0 ? sortedCups[0] : null;
+
+            if (minCupForAPI) {
+                // FANZA APIのパラメーターは 'min_bust' (指定カップ数以上) を使います
+                searchParams += `&min_bust=${minCupForAPI}`; 
             }
         }
         
@@ -167,7 +200,6 @@ body {
         fetch(requestUrl)
           .then(response => response.json())
           .then(data => {
-            // コンソールにデータを表示 (F12キーで確認)
             console.log("APIから取得したデータ:", data); 
 
             let filteredItems = data.result.items || [];
@@ -177,7 +209,6 @@ body {
             
             if (filteredItems.length > 0) {
                  filteredItems.forEach(item => {
-                     // 仮でタイトルと、APIが持っているカップ数を表示
                      const bustSize = item.sizes ? ` (B: ${item.sizes.bust})` : '';
                      resultDiv.innerHTML += `<div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 5px;">
                                                 <p><strong>${item.title}</strong>${bustSize}</p>
