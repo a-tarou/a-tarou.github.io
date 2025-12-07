@@ -61,6 +61,26 @@ body {
 #search-button:hover {
     background-color: #0056b3;
 }
+
+/* ★★★ ここから検索結果リストの新しいCSSです ★★★ */
+.actress-list {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.actress-item {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+    overflow: hidden; /* float解除のため */
+}
+
+.actress-item h3 {
+    margin-top: 0;
+}
+/* ★★★ ここまで新しいCSSです ★★★ */
 </style>
 
 </head>
@@ -121,14 +141,29 @@ body {
         <button id="search-button" onclick="fetchActressData()">検索する</button>
     </div>
 
-    <hr>
+  <hr>
 
-    <div class="actress-list">
-        <h2>検索結果</h2>
-        <p id="loading-message">ここに女優さんのデータが表示される予定です。FANZAの承認を待っています...</p>
+<div class="actress-list">
+    <h2>検索結果</h2>
+    <div class="actress-item">
+        <img src="placeholder.png" alt="女優の写真" style="width: 100px; height: 100px; object-fit: cover; float: left; margin-right: 15px;">
+        <h3>女優名（例：石川 澪）</h3>
+        <p><strong>タグ:</strong> #清楚系 #スレンダー</p>
+        <a href="#">詳細を見る</a> | <a href="#">作品を見る</a>
+        <div style="clear: both;"></div>
     </div>
     
-    <script>
+    <div class="actress-item">
+        <img src="placeholder.png" alt="女優の写真" style="width: 100px; height: 100px; object-fit: cover; float: left; margin-right: 15px;">
+        <h3>女優名（例：河北 彩伽）</h3>
+        <p><strong>タグ:</strong> #美人系 #Fカップ</p>
+        <a href="#">詳細を見る</a> | <a href="#">作品を見る</a>
+        <div style="clear: both;"></div>
+    </div>
+    
+    <p id="loading-message">↑現在、仮のデータでデザインを確認中です。API承認を待っています。</p>
+</div>
+<script>
     // -----------------------------------------------------------
     // 独自の検索タグ用データ (要望③, ④)
     // -----------------------------------------------------------
@@ -165,18 +200,14 @@ body {
         
         // 1. カップ数の条件を追加 (要望① - 複数選択対応)
         if (checkedCups.length > 0) {
-            // Lカップ以上 ("L以上") のチェックボックスが選択されているか確認
             const includesLOver = checkedCups.includes("L以上");
-            
-            // 選択された中で最も小さなカップ数（例: B, C, Dが選択されたら B）をAPIに送ります
             const sortedCups = checkedCups
-                                .filter(c => c.length === 1) // L以上の文字列を除外
+                                .filter(c => c.length === 1)
                                 .sort(); 
 
             let minCupForAPI = sortedCups.length > 0 ? sortedCups[0] : null;
 
             if (minCupForAPI) {
-                // FANZA APIのパラメーターは 'min_bust' (指定カップ数以上) を使います
                 searchParams += `&min_bust=${minCupForAPI}`; 
             }
         }
@@ -205,6 +236,7 @@ body {
             let filteredItems = data.result.items || [];
             
             // データをサイトに表示する処理
+            // ここは承認後に、APIデータを使って動的にHTMLを生成するように書き換えます。
             resultDiv.innerHTML = `<h2>検索結果 (${filteredItems.length}件表示 - 承認待ち)</h2>`;
             
             if (filteredItems.length > 0) {
