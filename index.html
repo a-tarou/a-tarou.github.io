@@ -124,18 +124,27 @@ body {
             </div>
         </div>
         
-        <div class="input-group">
-            <label>体型 (独自タグ):</label>
-            <div id="bodytype-checkboxes" style="display: flex; flex-wrap: wrap;">
-                <p style="font-size: 0.9em; color: #666;">※ここに体型のチェックボックスが表示されます（承認後に実装）</p>
-            </div>
-        </div>
+<div class="input-group">
+    <label>体型 (独自タグ - 複数選択可):</label>
+    <div id="bodytype-checkboxes" style="display: flex; flex-wrap: wrap;">
+        <input type="checkbox" id="body_slender" name="bodytype" value="スレンダー"><label for="body_slender" style="margin-right: 15px;">スレンダー</label>
+        <input type="checkbox" id="body_average" name="bodytype" value="普通"><label for="body_average" style="margin-right: 15px;">普通</label>
+        <input type="checkbox" id="body_glamour" name="bodytype" value="グラマー"><label for="body_glamour" style="margin-right: 15px;">グラマー</label>
+        <input type="checkbox" id="body_petite" name="bodytype" value="小柄"><label for="body_petite" style="margin-right: 15px;">小柄</label>
+        <input type="checkbox" id="body_athletic" name="bodytype" value="アスリート"><label for="body_athletic" style="margin-right: 15px;">アスリート</label>
+    </div>
+</div>
 
-        <div class="input-group">
-            <label>系統 (独自タグ):</label>
-            <div id="genre-checkboxes" style="display: flex; flex-wrap: wrap;">
-                <p style="font-size: 0.9em; color: #666;">※ここに系統のチェックボックスが表示されます（承認後に実装）</p>
-            </div>
+<div class="input-group">
+    <label>系統 (独自タグ - 複数選択可):</label>
+    <div id="genre-checkboxes" style="display: flex; flex-wrap: wrap;">
+        <input type="checkbox" id="genre_cute" name="genre" value="可愛い系"><label for="genre_cute" style="margin-right: 15px;">可愛い系</label>
+        <input type="checkbox" id="genre_beautiful" name="genre" value="美人系"><label for="genre_beautiful" style="margin-right: 15px;">美人系</label>
+        <input type="checkbox" id="genre_clean" name="genre" value="清楚系"><label for="genre_clean" style="margin-right: 15px;">清楚系</label>
+        <input type="checkbox" id="genre_young" name="genre" value="年下系"><label for="genre_young" style="margin-right: 15px;">年下系</label>
+        <input type="checkbox" id="genre_mature" name="genre" value="お姉さん系"><label for="genre_mature" style="margin-right: 15px;">お姉さん系</label>
+    </div>
+</div>
         </div>
         
         <button id="search-button" onclick="fetchActressData()">検索する</button>
@@ -297,4 +306,5 @@ body {
 </script>
 </body>
 </html>
+
 
